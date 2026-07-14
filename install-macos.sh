@@ -5,10 +5,16 @@ MANAGED_DIR="/Library/Application Support/ClaudeCode"
 MANAGED_FILE="$MANAGED_DIR/managed-settings.json"
 BACKUP_FILE="$MANAGED_DIR/managed-settings.json.bak.$(date +%Y%m%d%H%M%S)"
 
-echo "== Claude Code managed settings installer =="
+echo "== Claude Code managed settings installer (macOS) =="
 
 if [[ $EUID -eq 0 ]]; then
   echo "Don't run this script itself with sudo — it will call sudo internally when needed."
+  exit 1
+fi
+
+if [[ "$(uname -s)" != "Darwin" ]]; then
+  echo "This installer targets macOS. Detected OS: $(uname -s)."
+  echo "Use install-linux.sh on Linux/WSL2, or install-windows.ps1 on native Windows."
   exit 1
 fi
 
@@ -26,53 +32,11 @@ if [[ -f "$MANAGED_FILE" ]]; then
   sudo cp "$MANAGED_FILE" "$BACKUP_FILE"
 fi
 
-echo "Writing hardened managed-settings.json..."
-sudo tee "$MANAGED_FILE" > /dev/null << 'EOF'
-{
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "permissions": {
-    "deny": [
-      "Read(./.env)",
-      "Read(./.env.*)",
-      "Read(**/.env)",
-      "Read(**/secrets/**)",
-      "Read(**/*.pem)",
-      "Read(**/*credentials*)",
-      "Read(~/.aws/**)",
-      "Read(~/.ssh/**)",
-      "Bash(curl *)",
-      "Bash(wget *)",
-      "Bash(rm -rf *)",
-      "Bash(git push --force *)"
-    ],
-    "disableBypassPermissionsMode": "disable",
-    "allowManagedPermissionRulesOnly": true
-  },
-  "sandbox": {
-    "enabled": true,
-    "allowUnsandboxedCommands": false,
-    "excludedCommands": ["git", "docker"],
-    "network": {
-      "allowedDomains": [
-        "github.com",
-        "*.npmjs.org",
-        "registry.yarnpkg.com"
-      ]
-    }
-  },
-  "allowManagedHooksOnly": true,
-  "strictKnownMarketplaces": [],
-  "forceLoginMethod": "claudeai",
-  "env": {
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-    "CLAUDE_CODE_ENABLE_TELEMETRY": "1"
-  },
-  "companyAnnouncements": [
-    "This session is running under org security policy.",
-    "Report AI-related security concerns to the security team."
-  ]
-}
-EOF
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+echo "Copying managed-settings.json from repository..."
+sudo cp "$SCRIPT_DIR/managed-settings.json" "$MANAGED_FILE"
+
 
 echo "Validating JSON..."
 if ! python3 -m json.tool "$MANAGED_FILE" > /dev/null; then
@@ -94,4 +58,5 @@ echo "Done. Managed settings installed at:"
 echo "  $MANAGED_FILE"
 echo ""
 echo "Next: open a Claude Code session (claude) in any project and run /permissions"
-echo "to confirm the managed deny rules are listed."
+echo "to confirm the managed deny rules are listed, then run /sandbox to confirm"
+echo "the sandbox is active."

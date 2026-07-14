@@ -21,6 +21,7 @@
   "sandbox": {
     "enabled": true,
     "allowUnsandboxedCommands": false,
+    "excludedCommands": ["git", "docker"],
     "network": {
       "allowedDomains": [
         "github.com",

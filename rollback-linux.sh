@@ -1,10 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
-MANAGED_DIR="/Library/Application Support/ClaudeCode"
+MANAGED_DIR="/etc/claude-code"
 MANAGED_FILE="$MANAGED_DIR/managed-settings.json"
 
-echo "== Claude Code managed settings rollback =="
+echo "== Claude Code managed settings rollback (Linux / WSL2) =="
 
 if [[ $EUID -eq 0 ]]; then
   echo "Don't run this script itself with sudo — it will call sudo internally when needed."

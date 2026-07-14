@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(**/.env)",
+      "Read(**/secrets/**)",
+      "Read(**/*.pem)",
+      "Read(**/*credentials*)",
+      "Read(~/.aws/**)",
+      "Read(~/.ssh/**)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(rm -rf *)",
+      "Bash(git push --force *)"
+    ],
+    "disableBypassPermissionsMode": "disable",
+    "allowManagedPermissionRulesOnly": true
+  },
+  "sandbox": {
+    "enabled": true,
+    "allowUnsandboxedCommands": false,
+    "network": {
+      "allowedDomains": [
+        "github.com",
+        "*.npmjs.org",
+        "registry.yarnpkg.com"
+      ]
+    }
+  },
+  "allowManagedHooksOnly": true,
+  "strictKnownMarketplaces": [],
+  "forceLoginMethod": "claudeai",
+  "env": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1"
+  },
+  "companyAnnouncements": [
+    "This session is running under org security policy.",
+    "Report AI-related security concerns to the security team."
+  ]
+}
